@@ -27,7 +27,7 @@ scroll_lock: bool = True
 update_task = None
 
 
-def factor(points, step, speed):
+def factor(points: list[float], step: int, speed: float):
     i = int(speed // step)
     if i >= len(points) - 1:
         return points[-1]
@@ -80,7 +80,7 @@ def create_pid_file() -> None:
         f.write(f"{os.getpid()}\n")
 
 
-def key_down(_keys, _keyboards) -> bool:
+def key_down(_keys: tuple[int, ...], _keyboards: list[InputDevice]) -> bool:
     for keyboard in _keyboards[:]:
         try:
             active_keys = keyboard.active_keys()
@@ -96,15 +96,17 @@ def key_down(_keys, _keyboards) -> bool:
     return False
 
 
-async def handle_mouse_events(_keys, _keyboards: list[InputDevice]) -> None:
-    MOUSE = "Ploopy Corporation Ploopy Nano 2 Trackball Mouse"
-    POINTS = [0.1, 0.3, 0.6, 1.0, 1.5]
-    STEP = 5
+async def handle_mouse_events(
+    _keys: tuple[int, ...], _keyboards: list[InputDevice]
+) -> None:
+    ploopy_mouse = "Ploopy Corporation Ploopy Nano 2 Trackball Mouse"
+    points = [0.1, 0.3, 0.6, 1.0, 1.5]
+    step = 5
 
-    mouse = get_device(MOUSE)
+    mouse = get_device(ploopy_mouse)
 
     create_pid_file()
-    logger.debug(f"Created pid file; Starting '{MOUSE}' handling")
+    logger.debug(f"Created pid file; Starting '{ploopy_mouse}' handling")
 
     with (
         UInput.from_device(mouse, name="ploopy-accel") as ui,
@@ -139,7 +141,7 @@ async def handle_mouse_events(_keys, _keyboards: list[InputDevice]) -> None:
 
                 if (dx or dy) and last_t:
                     dt = max((t - last_t) * 1000, 1.0)  # ms
-                    f = factor(POINTS, STEP, math.hypot(dx, dy) / dt)
+                    f = factor(points, step, math.hypot(dx, dy) / dt)
 
                     rx += dx * f
                     ry += dy * f
@@ -161,12 +163,12 @@ async def handle_mouse_events(_keys, _keyboards: list[InputDevice]) -> None:
 
 
 async def handle_button_events() -> None:
-    BUTTON = "Ploopy Corporation Ploopy Nano 2 Trackball"
-    button = get_device(BUTTON)
+    ploopy_button = "Ploopy Corporation Ploopy Nano 2 Trackball"
+    button = get_device(ploopy_button)
 
     global scroll_lock
 
-    logger.debug(f"Starting '{BUTTON}' handling")
+    logger.debug(f"Starting '{ploopy_button}' handling")
     with button.grab_context():
         async for ev in button.async_read_loop():
             if (
@@ -177,17 +179,17 @@ async def handle_button_events() -> None:
                 scroll_lock = not scroll_lock
 
 
-def schedule_update(signum: int, stack_frame: Any):
+def schedule_update(signum: int, stack_frame: Any):  # noqa: ARG001
     global update_task
     logger.debug("Scheduling update")
     if update_task is not None:
-        logger.info("Task is already running")
+        logger.debug("Task is already running")
         return
 
     update_task = asyncio.create_task(update_kb_dev())
 
 
-async def update_kb_dev():
+async def update_kb_dev() -> None:
     global update_task
 
     logger.debug("Updating keyboards")
