@@ -1,0 +1,10 @@
+#
+# ~/.config/systemd/user/ploopy.service
+#
+
+[Unit]
+Description=Configure Ploopy trackball
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/.config/ploopy/ploo.py

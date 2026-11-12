@@ -1,0 +1,6 @@
+#
+# /etc/udev/rules.d/72-keyboard.rules
+#
+
+ACTION=="add",    KERNEL=="event[0-9]*", SUBSYSTEM=="input", RUN+="/usr/bin/python3 /home/anton/.config/ploopy/update_kb_dev.py"
+ACTION=="remove", KERNEL=="event[0-9]*", SUBSYSTEM=="input", RUN+="/usr/bin/python3 /home/anton/.config/ploopy/update_kb_dev.py"

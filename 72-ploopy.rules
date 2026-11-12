@@ -1,0 +1,8 @@
+#
+# /etc/udev/rules.d/72-ploopy.rules
+#
+
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", SUBSYSTEMS=="usb", \
+    ATTRS{idVendor}=="5043", ATTRS{idProduct}=="4ce5", \
+    TAG+="uaccess", TAG+="systemd", \
+    ENV{SYSTEMD_USER_WANTS}+="ploopy.service"
